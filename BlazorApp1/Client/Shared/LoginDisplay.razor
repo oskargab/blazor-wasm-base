@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization;
+@using BlazorApp1.Client.Providers;
+@inject AuthenticationStateProvider _authStateProvider;
+@inject NavigationManager _navigationManager;
+@inject Blazored.LocalStorage.ILocalStorageService _localStorageService;
+@inject UserState _userState
+@inject HttpClient http
+
+<AuthorizeView>
+    <Authorized>
+        <MudLink Color="Color.Secondary" Class="pl-4" Href="#">@context.User.Identity?.Name</MudLink>
+        <MudLink Color="Color.Secondary" Class="pl-4" Href="#" @onclick="Logout">Log out</MudLink>
+    </Authorized>
+    <NotAuthorized>
+        <MudLink Color="Color.Secondary" Class="pl-4" Href="/login">Log in</MudLink>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private async Task Logout()
+    {
+        var res = await http.PostAsync("/auth/logout", null);
+        
+        if (res.IsSuccessStatusCode || res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            (_authStateProvider as CustomAuthStateProvider).ClearAuthInfo();
+            await _localStorageService.RemoveItemAsync("isauthenticated");
+            _navigationManager.NavigateTo("/", true);
+        }
+        else
+        {
+            (_authStateProvider as CustomAuthStateProvider).ClearAuthInfo();
+            await _localStorageService.RemoveItemAsync("isauthenticated");
+            _navigationManager.NavigateTo("/", true);
+        }
+     
+    }
+}

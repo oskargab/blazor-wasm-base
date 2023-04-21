@@ -1,0 +1,21 @@
+﻿@page "/"
+@inject UserState user
+@layout HomeLayout
+
+<PageTitle>Index</PageTitle>
+
+<MudText Typo="Typo.h3">Hello, world!</MudText>
+
+Welcome to your new app.
+
+
+<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+    <Authorized>
+        Logged in :)
+        @user.Email
+        <MudButton Href="/portal" Size="Size.Large" Variant="Variant.Outlined" Color="Color.Primary">Portal</MudButton>
+    </Authorized>
+    <NotAuthorized>
+        You are not logged in
+    </NotAuthorized>
+</Microsoft.AspNetCore.Components.Authorization.AuthorizeView>

@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Net;
+@using BlazorApp1.Client.Providers;
+@inject Blazored.LocalStorage.ILocalStorageService _localStorageService;
+@inject AuthenticationStateProvider _authStateProvider
+@inject HttpClient httpClient
+@using BlazorApp1.Shared;
+@inject UserState _userState;
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="@OnNavigateAsync">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(HomeLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(HomeLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+
+        var auth = await _localStorageService.GetItemAsync<string>("isauthenticated");
+        if (string.IsNullOrEmpty(auth) && args.Path.ToLower().Contains("externalauth=true"))
+        {
+            auth = "true";
+            await _localStorageService.SetItemAsStringAsync("isauthenticated", "true");
+        }
+        var user = (await (_authStateProvider as CustomAuthStateProvider)
+        .GetAuthenticationStateAsync()).User;
+
+        if (!string.IsNullOrEmpty(auth) && !user.Identity.IsAuthenticated)
+        {
+            //var response = await httpClient.GetFromJsonAsync<UserProfileDto>("/user-profile");
+            var res = await httpClient.GetAsync("/auth/user-profile");
+
+            if (res.IsSuccessStatusCode)
+            {
+                var userProfile = await res.Content.ReadFromJsonAsync<UserProfileDto>();
+                (_authStateProvider as CustomAuthStateProvider)
+                .SetAuthInfo(userProfile);
+                _userState.Email = userProfile.Email;
+
+            }
+            else if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await _localStorageService.RemoveItemAsync("isauthenticated");
+            }
+            else
+            {
+                await _localStorageService.RemoveItemAsync("isauthenticated");
+            }
+
+        }
+    }
+}
