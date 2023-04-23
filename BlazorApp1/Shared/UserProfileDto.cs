@@ -2,9 +2,9 @@
 {
     public class UserProfileDto
     {
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
-        public required string Email { get; set; }
+        
+        public DiscordAccountDto? DiscordAccount { get; set; }
+        public GoogleAccountDto? GoogleAccount {get; set; }
 
     }
 }

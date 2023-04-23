@@ -30,16 +30,16 @@ namespace BlazorApp1.Server.Controllers
 
         [HttpGet]
         [Route("user-profile")]
-        public async Task<IActionResult> UserProfileAsync([FromUserId]string userId/*[ModelBinder(typeof(UserIdModelBinder))]string userId*/)
+        public async Task<IActionResult> UserProfileAsync([ModelBinder(typeof(UserIdModelBinder))]string userId/*[ModelBinder(typeof(UserIdModelBinder))]string userId*/)
         {
-
+            var user = dbContext.Users.Find(userId);
             return Ok(new UserProfileDto() { Email="rerere", FirstName="rerae", LastName="reare"}  /*userProfile*/);
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("google-login")]
-        public IActionResult GoogleLogin(string returnURL )
+        public IActionResult GoogleLogin()
         {
             return Challenge(
                 new AuthenticationProperties
@@ -49,6 +49,30 @@ namespace BlazorApp1.Server.Controllers
                 },
                 GoogleDefaults.AuthenticationScheme
             ); ;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("discord-login")]
+        public IActionResult DiscordLogin()
+        {
+
+            return Challenge(
+                new AuthenticationProperties
+                {
+                    RedirectUri = Request.Scheme + "://" + HttpContext.Request.Host.ToString() + "?externalAuth=true"
+
+                },
+                authenticationSchemes: new string[] { "discord" }
+            );
+        }
+
+        [HttpPost]
+        [Route("logout")]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await HttpContext.SignOutAsync();
+            return Ok("success");
         }
     }
 }

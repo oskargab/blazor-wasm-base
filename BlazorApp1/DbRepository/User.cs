@@ -8,8 +8,9 @@ namespace DbRepository
 {
     public class User
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public InternalAccount? InternalAccount {get;set;}
         public GoogleAccount? GoogleAccount { get; set; }
+        public DiscordAccount? DiscordAccount { get; set; }
     }
 }

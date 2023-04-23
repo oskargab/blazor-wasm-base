@@ -16,10 +16,10 @@ namespace BlazorApp1.Server.ModelBinders
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            var r = bindingContext.HttpContext.User.Claims.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            var r = bindingContext.HttpContext.User.Claims.SingleOrDefault(x => x.OriginalIssuer == "LOCAL AUTHORITY" && x.Issuer == "LOCAL AUTHORITY" && x.Type == ClaimTypes.NameIdentifier);
             if (r == null)
             {
-                throw new ArgumentException("No userid(ClaimTypes.NameIdentifier) found in claims");
+                throw new ArgumentException("No userid(ClaimTypes.NameIdentifier) with issuer LocalAuthority found in claims");
             }
             var model = r.Value;
             bindingContext.Result = ModelBindingResult.Success(model);
