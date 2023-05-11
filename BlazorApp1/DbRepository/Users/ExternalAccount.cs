@@ -6,13 +6,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DbRepository
+namespace DbRepository.Users
 {
     public interface IExternalAccount
     {
         public bool AllowLogin { get; set; }
         public string ExternalId { get; set; }
-        public IExternalAccount Init(bool allowLogin, IEnumerable<Claim>claims);
+        public User User { get; set; }
+
+        public IExternalAccount Init(bool allowLogin, IEnumerable<Claim> claims);
         public User CreateUser();
     }
     public abstract class ExternalAccount
@@ -20,5 +22,7 @@ namespace DbRepository
         [Key]
         public string ExternalId { get; set; }
         public bool AllowLogin { get; set; }
+        public User User { get; set; }
+
     }
 }

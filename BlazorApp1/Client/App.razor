@@ -50,7 +50,7 @@
                 var userProfile = await res.Content.ReadFromJsonAsync<UserProfileDto>();
                 (_authStateProvider as CustomAuthStateProvider)
                 .SetAuthInfo(userProfile);
-                _userState.Email = userProfile.Email;
+                _userState.DisplayName = userProfile.DisplayName;
 
             }
             else if (res.StatusCode == HttpStatusCode.Unauthorized)

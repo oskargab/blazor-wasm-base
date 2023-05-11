@@ -1,4 +1,5 @@
 ﻿using DbRepository;
+using DbRepository.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,9 @@ namespace BlazorApp1.Server
     {
         public static async Task AddExternalAccountToDb<T>(MyDbContext db, OAuthCreatingTicketContext ctx) where T : class, IExternalAccount, new()
         {
-            var discordId = ctx.Identity.FindFirst(ClaimTypes.NameIdentifier);
-            
-            var getUser = db.Find<T>(discordId.Value);
+            var externalId = ctx.Identity.FindFirst(ClaimTypes.NameIdentifier);
 
+            var getUser = db.Find<T>(externalId.Value);
             string userId;
             if (getUser == null)
             {
@@ -24,7 +24,9 @@ namespace BlazorApp1.Server
             }
             else
             {
-                userId = getUser.ExternalId.ToString();
+                db.Entry(getUser).Reference(x => x.User).Load();
+
+                userId = getUser.User.Id.ToString();
             }
 
             await AddClaim(ctx, userId);

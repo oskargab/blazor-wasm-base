@@ -2,14 +2,14 @@
 {
     public class UserState
     {
-        private string? email;
+        private string? displayName;
 
-        public string Email
+        public string DisplayName
         {
-            get => email;
+            get => displayName;
             set
             {
-                email = value;
+                displayName = value;
                 NotifyStateChanged();
             }
         }

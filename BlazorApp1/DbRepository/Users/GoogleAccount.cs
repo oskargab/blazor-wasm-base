@@ -5,9 +5,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DbRepository
+namespace DbRepository.Users
 {
-    public class GoogleAccount :ExternalAccount, IExternalAccount
+    public class GoogleAccount : ExternalAccount, IExternalAccount
     {
         public string? Email { get; set; }
         public string? FirstName { get; set; }
@@ -16,13 +16,13 @@ namespace DbRepository
         {
 
         }
-        public GoogleAccount(bool allowLogin, IEnumerable<Claim> claims) 
+        public GoogleAccount(bool allowLogin, IEnumerable<Claim> claims)
         {
             AllowLogin = allowLogin;
             ExternalId = claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value;
             Email = claims.Single(x => x.Type == ClaimTypes.Email).Value;
             FirstName = claims.SingleOrDefault(x => x.Type == ClaimTypes.GivenName).Value;
-            LastName = claims.SingleOrDefault(x=>x.Type == ClaimTypes.Surname).Value;
+            LastName = claims.SingleOrDefault(x => x.Type == ClaimTypes.Surname).Value;
         }
 
         public IExternalAccount Init(bool allowLogin, IEnumerable<Claim> claims)

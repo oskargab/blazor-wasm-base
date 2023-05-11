@@ -2,6 +2,7 @@
 using Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BlazorApp1.Server.GrpcServices
 {
@@ -19,10 +20,10 @@ namespace BlazorApp1.Server.GrpcServices
             var rng = new Random();
 
             var httpContext = context.GetHttpContext();
-            var userId = httpContext.User.Claims
-            .Where(_ => _.Type == "userid")
-            .Select(_ => Guid.Parse(_.Value))
-            .First();
+            //var userId = httpContext.User.Claims
+            //.Where(_ => _.Type == ClaimTypes.NameIdentifier)
+            //.Select(_ => Guid.Parse(_.Value))
+            //.First();
 
             reply.Forecasts.Add(Enumerable.Range(1, 10).Select(index => new WeatherForecast
             {

@@ -22,8 +22,7 @@ namespace BlazorApp1.Client.Providers
         public void SetAuthInfo(UserProfileDto userProfile)
         {
             var identity = new ClaimsIdentity(new[]{
-            new Claim(ClaimTypes.Email, userProfile.Email),
-            new Claim(ClaimTypes.Name, $"{userProfile.FirstName} {userProfile.LastName}")
+            new Claim(ClaimTypes.Name, $"{userProfile.DisplayName}")
         }, "AuthCookie");
 
             claimsPrincipal = new ClaimsPrincipal(identity);

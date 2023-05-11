@@ -19,61 +19,44 @@ namespace BlazorApp1.Server.ModelBinders
             var r = bindingContext.HttpContext.User.Claims.SingleOrDefault(x => x.OriginalIssuer == "LOCAL AUTHORITY" && x.Issuer == "LOCAL AUTHORITY" && x.Type == ClaimTypes.NameIdentifier);
             if (r == null)
             {
-                throw new ArgumentException("No userid(ClaimTypes.NameIdentifier) with issuer LocalAuthority found in claims");
+                //throw new ArgumentException("No userid(ClaimTypes.NameIdentifier) with issuer LocalAuthority found in claims");
+                bindingContext.Result = ModelBindingResult.Failed();
             }
-            var model = r.Value;
-            bindingContext.Result = ModelBindingResult.Success(model);
+            else
+            {
+                var model = r.Value;
+                bindingContext.Result = ModelBindingResult.Success(model);
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public class NullUserIdModelBinder : IModelBinder
+    {
+        public NullUserIdModelBinder()
+        {
+        }
+
+        public Task BindModelAsync(ModelBindingContext bindingContext)
+        {
+            var r = bindingContext.HttpContext.User.Claims.SingleOrDefault(x => x.OriginalIssuer == "LOCAL AUTHORITY" && x.Issuer == "LOCAL AUTHORITY" && x.Type == ClaimTypes.NameIdentifier);
+            if (r == null)
+            {
+                bindingContext.Result = ModelBindingResult.Success(null);
+
+            }
+            else
+            {
+
+                var model = r.Value;
+                bindingContext.Result = ModelBindingResult.Success(model);
+            }
             return Task.CompletedTask;
         }
     }
 
 
-    public class UserIdValueProvider : BindingSourceValueProvider
-    {
-        private readonly ClaimsPrincipal _claimsPrincipal;
 
-        public UserIdValueProvider(BindingSource bindingSource, ClaimsPrincipal claimsPrincipal) : base(bindingSource)
-        {
-            _claimsPrincipal = claimsPrincipal;
-        }
 
-        public override bool ContainsPrefix(string prefix)
-            => _claimsPrincipal.HasClaim(claim => claim.Type == prefix);
-
-        public override ValueProviderResult GetValue(string key)
-        {
-            var userIdValue = _claimsPrincipal.FindFirstValue(key);
-            return userIdValue != null ? new ValueProviderResult(userIdValue) : ValueProviderResult.None;
-        }
-    }
-    public static class UserIdBindingSource
-    {
-        public static readonly BindingSource UserId = new(
-            "UserId", // ID of our BindingSource, must be unique
-            "BindingSource_UserId", // Display name
-            isGreedy: false, // Marks whether the source is greedy or not
-            isFromRequest: true); // Marks if the source is from HTTP Request
-    }
-
-    public class UserIdValueProviderFactory : IValueProviderFactory
-    {
-        public Task CreateValueProviderAsync(ValueProviderFactoryContext context)
-        {
-            context.ValueProviders.Add(new UserIdValueProvider(UserIdBindingSource.UserId, context.ActionContext.HttpContext.User));
-            return Task.CompletedTask;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Parameter)]
-    public class FromUserIdAttribute : Attribute, IBindingSourceMetadata
-    {
-        public FromUserIdAttribute()
-        {
-        }
-        public BindingSource BindingSource => UserIdBindingSource.UserId;
-    }
-
-    
-
-   
 }

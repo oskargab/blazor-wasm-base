@@ -32,8 +32,8 @@ namespace BlazorApp1.Server.Controllers
         [Route("user-profile")]
         public async Task<IActionResult> UserProfileAsync([ModelBinder(typeof(UserIdModelBinder))]string userId/*[ModelBinder(typeof(UserIdModelBinder))]string userId*/)
         {
-            var user = dbContext.Users.Find(userId);
-            return Ok(new UserProfileDto() { Email="rerere", FirstName="rerae", LastName="reare"}  /*userProfile*/);
+            var user = dbContext.Users.Find(Guid.Parse(userId));
+            return Ok(new UserProfileDto() { DisplayName="Some name", DiscordAccount=null, GoogleAccount=null}  /*userProfile*/);
         }
 
         [AllowAnonymous]

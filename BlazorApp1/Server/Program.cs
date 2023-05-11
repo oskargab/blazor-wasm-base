@@ -2,12 +2,14 @@ using BlazorApp1.Server;
 using BlazorApp1.Server.GrpcServices;
 using BlazorApp1.Server.ModelBinders;
 using DbRepository;
+using DbRepository.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -20,9 +22,7 @@ var config = builder.Configuration;
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddRazorPages();
-builder.Services.AddControllersWithViews( x=> {
-    x.ValueProviderFactories.Add(new UserIdValueProviderFactory());
-});
+builder.Services.AddControllersWithViews();
 
 var DbConfig = config.GetSection(DatabaseConfig.SectionName).Get<DatabaseConfig>();
 var googleConfig = config.GetSection(GoogleAuthConfig.SectionName).Get<GoogleAuthConfig>();
@@ -62,31 +62,6 @@ builder.Services
             var db = ctx.HttpContext.RequestServices.GetRequiredService<MyDbContext>();
 
             await tmpClass.AddExternalAccountToDb<GoogleAccount>(db, ctx);
-            //var getUser = db.DiscordAccounts.SingleOrDefaultAsync(x => x.UserId == discordId.Value);
-            //string userId;
-            //if (getUser == null)
-            //{
-            //    var newUser = new User()
-            //    {
-            //        DiscordAccount = new DiscordAccount(true, ctx.Identity.Claims)
-            //    };
-            //    db.Users.Add(newUser);
-            //    await db.SaveChangesAsync();
-            //    userId = newUser.Id.ToString();
-            //}
-            //else
-            //{
-            //    userId = getUser.Id.ToString();
-            //}
-            //var claims = new List<Claim>
-            //    {
-            //        new Claim(ClaimTypes.NameIdentifier, userId)
-            //    };
-
-            //var claimsIdentity = new ClaimsIdentity(
-            //    claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            
-            //ctx.Principal.AddIdentity(claimsIdentity);
             return;
         };
 
@@ -128,34 +103,6 @@ builder.Services
 
              await tmpClass.AddExternalAccountToDb<DiscordAccount>(db, ctx);
 
-             //var discordId = ctx.Identity.FindFirst(ClaimTypes.NameIdentifier);
-
-             //var db = ctx.HttpContext.RequestServices.GetRequiredService<MyDbContext>();
-             //var getUser = db.DiscordAccounts.SingleOrDefaultAsync(x => x.ExternalId == discordId.Value);
-             //string userId;
-             //if(getUser == null)
-             //{
-             //    var newUser = new User()
-             //    {
-             //        DiscordAccount = new DiscordAccount(true, ctx.Identity.Claims)
-             //    };
-             //    db.Users.Add(newUser);
-             //    await db.SaveChangesAsync();
-             //    userId = newUser.Id.ToString();
-             //}
-             //else
-             //{
-             //    userId = getUser.Id.ToString();
-             //}
-             //var claims = new List<Claim>
-             //   {
-             //       new Claim(ClaimTypes.NameIdentifier, userId)
-             //   };
-
-             //var claimsIdentity = new ClaimsIdentity(
-             //    claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-             //ctx.Principal.AddIdentity(claimsIdentity);
              return;
 
          };
@@ -166,6 +113,7 @@ builder.Services.AddAuthorization();
 
 
 builder.Services.AddDbContext<MyDbContext>(o => o.UseNpgsql(DbConfig.ConnectionString));
+
 
 var app = builder.Build();
 
